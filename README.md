@@ -1,62 +1,32 @@
 # update-flow
 
-How a WordPress core release round actually goes for a one-person agency with ten of its own themes and plugins: where the time goes, what broke, what to automate.
+Notes on how a WordPress core update round actually goes for a one-person agency that maintains its own themes and plugins: what gets tested, where the time goes, what breaks, and what is worth automating.
 
-First case: **WordPress 7.2 (RC3 test pass, Nov 26, 2026)**. Source: commit history of the ten repos, `seo-strategy/docs/wp-7-2-compatibility-test-plan-2026-11.md`, and the Nov 2026 log.
+Not a tool. A running record, one file per round, so the next round starts from numbers instead of memory.
 
-## Repos covered
+## The flow
 
-Aludra, Warder Cookie Consent, Waygate, Min (plugins); Elayne, Elayne Legal, Aviendha, Ixian, Winespring, Nynaeve (themes).
+1. **Set up** a test copy on the release candidate (backup the DB first).
+2. **Grep** each repo for the APIs the release changes (field guide and dev notes).
+3. **Test per repo:** lint and unit tests, pattern validation, editor pass (blocks valid after save and reload), front end, admin, console and `debug.log`.
+4. **Fix** what breaks, one branch per repo.
+5. **Release:** changelog, version bump, `Tested up to`, PR with test results in the body, merge, tag after merge, publish.
+6. **Deploy** the released packages to the demo and production sites, then verify in a real browser.
+7. **Log** results and gaps (what was not tested), and re-run on the final RC.
 
-## Where the time went (estimates)
+## Tools used
 
-Nothing logged time per activity. The split is rebuilt from commit timestamps and the test plan; treat the ranges as rough. The whole round took about 9-10 hours (08:00 to 19:35 commits, plus production deploys afterwards).
+- [WP Pattern Sentinel](https://github.com/imagewize/wp-pattern-sentinel): validates block patterns in a real editor.
+- Playwright scripts for editor and front-end passes.
+- Plugin Check, PHPCS, PHPUnit.
+- Trellis/Bedrock for deploys.
 
-| Activity | Time | Share |
+## Rounds
+
+| Round | Scope | Notes |
 |---|---|---|
-| Browser and editor passes (insert blocks, save and reload, front end, console, `debug.log`) | ~3 h | 30% |
-| Pattern validation with WP Pattern Sentinel, incl. fixing drift and re-runs (Elayne full run ~20 min for 161 patterns) | ~1.5-2 h | 15-20% |
-| Release pipeline (changelog, version bumps, PRs, tags, SVN, stale PR bodies) | ~2 h | 20% |
-| Production deploys and checks (Composer pins, Trellis, demo subsite rebuilds, browser checks) | ~1.5 h | 15% |
-| Setup and grep pass (RC3 on a Bedrock install, backups, Sentinel login problems) | ~1 h | 10% |
-| Actual bug fixes | ~0.5-1 h | 5-10% |
+| [WP 7.2 (Nov 26, 2026)](rounds/2026-11-wp-7-2.md) | 10 repos, 4 plugins and 6 themes | ~9-10 h, mostly verification; 3 small bugs found |
 
-Takeaway: almost all of the time went on proving nothing broke. Fixes were under an hour.
+## License
 
-## Timeline (commit times, Nov 26)
-
-| Time | Work |
-|---|---|
-| 08:00-09:30 | RC3 setup, DB backups, grep pass, first Aludra tests |
-| 09:30-11:25 | Aludra, Warder, Waygate, Min |
-| 11:30-12:35 | Elayne (Sentinel, pattern fixes, release) |
-| 12:35-13:50 | Elayne Legal, Ixian |
-| 14:00-15:10 | Aviendha (browser-check test, release, tag mishap) |
-| 15:20-18:05 | Winespring (Sentinel bump, WooCommerce pass, release) |
-| 18:05-19:35 | Nynaeve (33 blocks, Feature Cards fix, release) |
-
-## What the 7.2 checklist found
-
-| 7.2 area | Result |
-|---|---|
-| REST / CORS | Routes register and respond; no changes needed |
-| Abilities API | Aludra and Waygate abilities register; no changes needed |
-| Interactivity API | Aludra mega-menu works on RC3 |
-| `__experimentalGroup` removal | No hits in any repo |
-| Admin menu SVG icons, jQuery Migrate 3.6.0 | Not applicable or no warnings |
-| New `InnerBlocks` `template` prop deprecation | Still works; migration filed (Aludra #85) |
-
-## What actually broke
-
-- Aludra Free Shipping Bar Inspector crashed (`NumberControl` is not a stable export).
-- Numeric image `width`/`height` in templates makes `core/image` invalid after reload (Aludra 3 blocks, Nynaeve Feature Cards). Not a 7.2 regression.
-- Min Sentinel fixture used live text instead of the `block.json` default.
-- Elayne pattern drift (editor-normalized headers, `displayLayout`, 7.1 attribute format).
-- Unrelated content bug: 12 Nynaeve pages lost backslashes in `-`.
-
-## Ideas to cut the time
-
-- Run Sentinel in parallel per repo or per pattern batch; the 20-minute full run is the longest single wait.
-- Turn the per-repo browser pass into one shared script (Aviendha and Elayne Legal now have `tests/browser-check.js`).
-- Template the release steps (changelog, bump, PR body with test results, tag after merge) so the pipeline is one command.
-- Never re-tag: Packagist pins published versions (Aviendha 1.18.13 mishap).
+[MIT](LICENSE)
