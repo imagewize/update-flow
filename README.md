@@ -37,6 +37,8 @@ What that changes in a round:
 - [pt-cli](https://github.com/imagewize/pt-cli): static block-markup check of theme patterns and templates, no WordPress install needed (`composer check`). Fast first pass before Sentinel.
 - Playwright scripts for editor and front-end passes.
 - Plugin Check, PHPCS, PHPUnit.
+- [Composer](https://getcomposer.org/): core, themes and plugins are dependencies on Bedrock; pins and lockfiles decide what ships, and `composer lint` / `composer check` scripts run the checks in each repo.
+- [Packagist](https://packagist.org/): where released theme and plugin versions are published (tags are immutable).
 - Trellis/Bedrock for deploys.
 
 ## Rounds
