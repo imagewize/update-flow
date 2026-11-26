@@ -6,13 +6,30 @@ Not a tool. A running record, one file per round, so the next round starts from 
 
 ## The flow
 
-1. **Set up** a test copy on the release candidate (backup the DB first).
+1. **Set up** a test copy on the release candidate (backup the DB first; on Bedrock, core is moved with WP-CLI, not Beta Tester).
 2. **Grep** each repo for the APIs the release changes (field guide and dev notes).
 3. **Test per repo:** lint and unit tests, pattern validation, editor pass (blocks valid after save and reload), front end, admin, console and `debug.log`.
 4. **Fix** what breaks, one branch per repo.
 5. **Release:** changelog, version bump, `Tested up to`, PR with test results in the body, merge, tag after merge, publish.
-6. **Deploy** the released packages to the demo and production sites, then verify in a real browser.
+6. **Deploy:** bump the Composer pins in the main-site and demo repos, run `trellis deploy`, then verify in a real browser.
 7. **Log** results and gaps (what was not tested), and re-run on the final RC.
+
+## Bedrock and Composer: how updates reach the sites
+
+Both sites are Bedrock installs deployed with Trellis, so WordPress core, themes and plugins are Composer dependencies, not wp-admin updates.
+
+| Site | Install | Theme type | Packages pinned in Composer |
+|---|---|---|---|
+| Main site (imagewize.com) | Bedrock, `site/composer.json` | Nynaeve: hybrid (Sage/Blade templates plus block editor, custom blocks) | Nynaeve, Min, Warder |
+| Demo (demo.imagewize.com) | Separate Bedrock multisite, `demo/composer.json` | FSE block themes: Elayne (all subsites), Elayne Legal, Aviendha, Ixian, Winespring | those themes, plus Aludra, Warder, Waygate |
+
+What that changes in a round:
+
+- **Core is pinned.** Beta Tester can't upgrade a Bedrock install. Move the test copy with `wp core update --version=<RC>` after a DB backup, and remember a `composer install` reverts it.
+- **A package only reaches production through three steps:** release (tag after merge) -> bump the pin in the site's `composer.json` and lock -> `trellis deploy`. Tag only after merge: Packagist treats published versions as immutable, so a moved tag can't be fixed, only superseded by a new version.
+- **Production stays on the old core** until the release day; the new `Tested up to` ships first, so nothing shows a compatibility warning.
+- **Hybrid vs FSE needs different checks.** FSE themes (Elayne and the rest) are mostly patterns, templates and `theme.json`, so pattern validation (pt-cli, Sentinel) and Site Editor passes carry the test. Nynaeve has Blade templates, so pt-cli's template check doesn't apply; the test is custom blocks in the editor, front-end pages and the build (`npm run build`).
+- **FSE patterns are rebuilt on the demo after a deploy.** The demo subsites are rebuilt from the new Elayne patterns, then browser-checked.
 
 ## Tools used
 
