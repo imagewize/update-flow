@@ -17,6 +17,7 @@ Not a tool. A running record, one file per round, so the next round starts from 
 ## Tools used
 
 - [WP Pattern Sentinel](https://github.com/imagewize/wp-pattern-sentinel): validates block patterns in a real editor.
+- [pt-cli](https://github.com/imagewize/pt-cli): static block-markup check of theme patterns and templates, no WordPress install needed (`composer check`). Fast first pass before Sentinel.
 - Playwright scripts for editor and front-end passes.
 - Plugin Check, PHPCS, PHPUnit.
 - Trellis/Bedrock for deploys.
