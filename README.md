@@ -1,4 +1,4 @@
-# update-flow: WordPress core update rounds on Roots Trellis and Bedrock
+# Update Flow
 
 Notes on how a WordPress core update round actually goes for a one-person agency that maintains its own themes and plugins on [Roots](https://roots.io/) [Trellis](https://roots.io/trellis/) and [Bedrock](https://roots.io/bedrock/) sites: what gets tested, where the time goes, what breaks, and what is worth automating.
 
