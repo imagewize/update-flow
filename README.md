@@ -45,7 +45,7 @@ What that changes in a round:
 
 | Round | Scope | Notes |
 |---|---|---|
-| [WP 7.2 (Nov 26, 2026)](rounds/2026-11-wp-7-2.md) | 10 repos, 4 plugins and 6 themes | ~10 h wall-clock, under 8 h dedicated (lunch + other repos/social interleaved), mostly verification; 3 code bugs found |
+| [WP 7.2 (Nov 26, 2026)](rounds/2026-11-wp-7-2.md) | 10 repos, 4 plugins and 6 themes | ~11.5 h wall-clock, ~8.5 h on the round (minus lunch, cambridge-practice, social), mostly verification; 3 code bugs found |
 
 ## License
 
