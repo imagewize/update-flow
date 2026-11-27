@@ -1,6 +1,8 @@
-# update-flow
+# update-flow: WordPress core update rounds on Roots Trellis and Bedrock
 
-Notes on how a WordPress core update round actually goes for a one-person agency that maintains its own themes and plugins: what gets tested, where the time goes, what breaks, and what is worth automating.
+Notes on how a WordPress core update round actually goes for a one-person agency that maintains its own themes and plugins on [Roots](https://roots.io/) [Trellis](https://roots.io/trellis/) and [Bedrock](https://roots.io/bedrock/) sites: what gets tested, where the time goes, what breaks, and what is worth automating.
+
+The flow assumes a Bedrock/Trellis setup, where core, themes and plugins are Composer dependencies and deploys run through Trellis. On a classic wp-admin-updated install, the RC setup and deploy steps differ; the testing and logging parts carry over.
 
 Not a tool. A running record, one file per round, so the next round starts from numbers instead of memory.
 
