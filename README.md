@@ -16,7 +16,11 @@ Not a tool. A running record, one file per round, so the next round starts from 
 
 ## Bedrock and Composer: how updates reach the sites
 
-Both sites are Bedrock installs deployed with Trellis, so WordPress core, themes and plugins are Composer dependencies, not wp-admin updates.
+Both sites are Bedrock installs deployed with Trellis, so WordPress core, themes and plugins are Composer dependencies, not wp-admin updates. Packages come from three places:
+
+- **Own themes and plugins** (`imagewize/*`): released on [Packagist](https://packagist.org/). A few that are not on Packagist, such as private ones, are pulled from their GitHub repo through a `vcs` repository entry.
+- **Third-party WordPress.org plugins and themes** (`wp-plugin/*`, `wp-theme/*`, e.g. WooCommerce, Contact Form 7, The SEO Framework): installed from [WP Packages](https://wp-packages.org/) via the `https://repo.wp-packages.org` repository entry. These move on their own release schedule, so check their `Tested up to` against the RC too.
+- **Premium plugins** such as ACF: from the vendor's own Composer repository.
 
 | Site | Install | Theme type | Packages pinned in Composer |
 |---|---|---|---|
@@ -26,7 +30,7 @@ Both sites are Bedrock installs deployed with Trellis, so WordPress core, themes
 What that changes in a round:
 
 - **Core is pinned.** Beta Tester can't upgrade a Bedrock install. Move the test copy with `wp core update --version=<RC>` after a DB backup, and remember a `composer install` reverts it.
-- **A package only reaches production through three steps:** release (tag after merge) -> bump the pin in the site's `composer.json` and lock -> `trellis deploy`. Tag only after merge: Packagist treats published versions as immutable, so a moved tag can't be fixed, only superseded by a new version.
+- **A package only reaches production through three steps:** release (tag after merge) -> bump the pin in the site's `composer.json` and lock -> `trellis deploy`. This applies to own packages; WP Packages versions just follow WordPress.org releases. Tag only after merge: Packagist treats published versions as immutable, so a moved tag can't be fixed, only superseded by a new version.
 - **Production stays on the old core** until the release day; the new `Tested up to` ships first, so nothing shows a compatibility warning.
 - **Hybrid vs FSE needs different checks.** FSE themes (Elayne and the rest) are mostly patterns, templates and `theme.json`, so pattern validation (pt-cli, Sentinel) and Site Editor passes carry the test. Nynaeve has Blade templates, so pt-cli's template check doesn't apply; the test is custom blocks in the editor, front-end pages and the build (`npm run build`).
 - **FSE patterns are rebuilt on the demo after a deploy.** The demo subsites are rebuilt from the new Elayne patterns, then browser-checked.
@@ -38,7 +42,8 @@ What that changes in a round:
 - Playwright scripts for editor and front-end passes.
 - Plugin Check, PHPCS, PHPUnit.
 - [Composer](https://getcomposer.org/): core, themes and plugins are dependencies on Bedrock; pins and lockfiles decide what ships, and `composer lint` / `composer check` scripts run the checks in each repo.
-- [Packagist](https://packagist.org/): where released theme and plugin versions are published (tags are immutable).
+- [Packagist](https://packagist.org/): where released versions of our own themes and plugins are published (tags are immutable).
+- [WP Packages](https://wp-packages.org/): Composer repository for third-party WordPress.org plugins and themes (`wp-plugin/*`, `wp-theme/*`).
 - Trellis/Bedrock for deploys.
 
 ## Rounds
