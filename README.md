@@ -20,8 +20,8 @@ Both sites are Bedrock installs deployed with Trellis, so WordPress core, themes
 
 | Site | Install | Theme type | Packages pinned in Composer |
 |---|---|---|---|
-| Main site (imagewize.com) | Bedrock, `site/composer.json` | Nynaeve: hybrid (Sage/Blade templates plus block editor, custom blocks) | Nynaeve, Min, Warder |
-| Demo (demo.imagewize.com) | Separate Bedrock multisite, `demo/composer.json` | FSE block themes: Elayne (all subsites), Elayne Legal, Aviendha, Ixian, Winespring | those themes, plus Aludra, Warder, Waygate |
+| Main site (imagewize.com) | Bedrock, `site/composer.json` | [Nynaeve](https://github.com/imagewize/nynaeve): hybrid (Sage/Blade templates plus block editor, custom blocks) | Nynaeve, Min (private), [Warder](https://github.com/imagewize/warder-cookie-consent) |
+| Demo (demo.imagewize.com) | Separate Bedrock multisite, `demo/composer.json` | FSE block themes: [Elayne](https://github.com/imagewize/elayne) (all subsites), [Elayne Legal](https://github.com/imagewize/elayne-legal), [Aviendha](https://github.com/imagewize/aviendha), [Ixian](https://github.com/imagewize/ixian), [Winespring](https://github.com/imagewize/winespring) | those themes, plus [Aludra](https://github.com/imagewize/aludra), Warder, [Waygate](https://github.com/imagewize/waygate) |
 
 What that changes in a round:
 
