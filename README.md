@@ -16,7 +16,7 @@ Not a tool. A running record, one file per round, so the next round starts from 
 
 ## Bedrock and Composer: how updates reach the sites
 
-Both sites are Bedrock installs deployed with Trellis, so WordPress core, themes and plugins are Composer dependencies, not wp-admin updates. Packages come from three places:
+Both sites are [Bedrock](https://roots.io/bedrock/) installs deployed with [Trellis](https://roots.io/trellis/), so WordPress core, themes and plugins are Composer dependencies, not wp-admin updates. Packages come from three places:
 
 - **Own themes and plugins** (`imagewize/*`): released on [Packagist](https://packagist.org/). A few that are not on Packagist, such as private ones, are pulled from their GitHub repo through a `vcs` repository entry.
 - **Third-party WordPress.org plugins and themes** (`wp-plugin/*`, `wp-theme/*`, e.g. WooCommerce, Contact Form 7, The SEO Framework): installed from [WP Packages](https://wp-packages.org/) via the `https://repo.wp-packages.org` repository entry. These move on their own release schedule, so check their `Tested up to` against the RC too.
@@ -49,7 +49,7 @@ What that changes in a round:
 - [Composer](https://getcomposer.org/): core, themes and plugins are dependencies on Bedrock; pins and lockfiles decide what ships, and `composer lint` / `composer check` scripts run the checks in each repo.
 - [Packagist](https://packagist.org/): where released versions of our own themes and plugins are published (tags are immutable).
 - [WP Packages](https://wp-packages.org/): Composer repository for third-party WordPress.org plugins and themes (`wp-plugin/*`, `wp-theme/*`).
-- Trellis/Bedrock for deploys.
+- [Trellis](https://roots.io/trellis/) and [Bedrock](https://roots.io/bedrock/) (both from Roots): server provisioning and deploys, and the Composer-based WordPress project structure.
 
 ## Rounds
 
