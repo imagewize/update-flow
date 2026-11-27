@@ -6,7 +6,8 @@ Guidance for coding agents (Claude Code, Vibe and others) working in this reposi
 
 A Markdown-only notes repo, not a tool: no build, lint, or test commands. It records how each WordPress core update round goes for a one-person agency (imagewize) that maintains its own themes and plugins. The point is that the next round starts from numbers instead of memory.
 
-- `README.md`: the general flow (setup → grep → test per repo → fix → release → deploy → log), how updates reach the Bedrock/Trellis sites via Composer, tools used, and the **Rounds** index table.
+- `README.md`: the general flow (setup → grep → test per repo → fix → release → deploy → log), tools used, and the **Rounds** index table.
+- `docs/bedrock-composer.md`: how updates reach the Bedrock/Trellis sites via Composer (package sources, RC setup, `composer install` reset, hybrid vs FSE checks).
 - `rounds/YYYY-MM-wp-X-Y.md`: one file per update round (e.g. `rounds/2026-11-wp-7-2.md`).
 
 ## Adding or editing a round
@@ -18,7 +19,7 @@ A Markdown-only notes repo, not a tool: no build, lint, or test commands. It rec
 
 ## Context worth knowing
 
-- Main site (imagewize.com) is a Bedrock install with Nynaeve, a hybrid Sage/Blade theme; the demo (demo.imagewize.com) is a separate Bedrock multisite with FSE block themes (Elayne and others). Hybrid and FSE themes need different checks (see README).
+- Main site (imagewize.com) is a Bedrock install with Nynaeve, a hybrid Sage/Blade theme; the demo (demo.imagewize.com) is a separate Bedrock multisite with FSE block themes (Elayne and others). Hybrid and FSE themes need different checks (see `docs/bedrock-composer.md`).
 - Min is a private repo; don't link to it.
 - Packagist tags are immutable: tag only after merge, never re-tag.
 
