@@ -36,17 +36,29 @@ The 7.2 round was driven by an AI coding assistant, mostly [Claude Code](https:/
 
 Rounds follow WordPress core releases, not client requests, and the person starts each one. The exact commands, step by step, are in [docs/automation-details.md](docs/automation-details.md). Ideas for automating more (parallel Sentinel, shared scripts, release templating) are in [docs/improvements.md](docs/improvements.md).
 
+## Ready-made tools the AI uses
+
+Claude Code and Mistral Vibe do not improvise the checks. They run tools we built earlier, which is why a round fits in a day. The assistant decides which command to run and reads the output; the tool does the work.
+
+| Tool | What it does | Where it saved time in the 7.2 round |
+|---|---|---|
+| [WP Pattern Sentinel](https://github.com/imagewize/wp-pattern-sentinel) | Loads each block pattern into the real Gutenberg editor with Playwright, saves it and reports block validation errors and content mismatches. Reads Trellis credentials from the vault with `--trellis` and writes a JSON log. | Validation that only a browser can do (the editor's `save()` rewrites markup in ways PHP can't predict): 161 Elayne patterns, Aludra's 53 and the other themes, with no hand-written Playwright per pattern. |
+| [wp-ops](https://github.com/imagewize/wp-ops) | Our CLI for the work between Trellis deploys (`trellis ops` add-on, also `wp-ops`). `db-pull` and `files-pull` copy production to local, `rsync-package-to-site` syncs a theme or plugin working copy into a site, and there are backups, `update-snapshot` / `update-compare` for before/after screenshots, `checkout-check`, monitoring and security scans. Every command is also an MCP tool, so Claude can call it directly. | Syncing each unreleased theme and plugin to the demo and main-site copies, and DB backups and pulls, each as one command instead of an `rsync` or `wp db export` string rebuilt per repo. |
+| [pt-cli](https://github.com/imagewize/pt-cli) | Static block-markup check of patterns and templates, no WordPress needed. | A seconds-long first pass before the 20-minute Sentinel run. |
+
+What the AI adds on top is the glue: which backup or core-update command to run for this setup, the helper that gives Sentinel a local login after a DB pull, grep patterns from the field guide, throwaway Playwright scripts for the editor and front end, and the PR and release text. Without the ready-made tools those steps would be the slow part.
+
 ## Bedrock and Composer
 
 Both sites are [Bedrock](https://roots.io/bedrock/) installs deployed with [Trellis](https://roots.io/trellis/), so core, themes and plugins are Composer dependencies, not wp-admin updates. That changes how the RC is installed (`wp core update`, which a `composer install` resets), how packages reach production (release, bump the pin, `trellis deploy`) and which checks apply to hybrid versus FSE themes. Details in [docs/bedrock-composer.md](docs/bedrock-composer.md).
 
 ## Tools used
 
-- [WP Pattern Sentinel](https://github.com/imagewize/wp-pattern-sentinel): validates block patterns in a real editor.
+- [WP Pattern Sentinel](https://github.com/imagewize/wp-pattern-sentinel): validates block patterns in a real editor (see above).
 - [pt-cli](https://github.com/imagewize/pt-cli): static block-markup check of theme patterns and templates, no WordPress install needed (`composer check`). Fast first pass before Sentinel.
 - Playwright scripts for editor and front-end passes (per-repo `tests/browser-check.js` where it exists).
 - [Claude Code](https://claude.com/claude-code) and Mistral Vibe: AI coding assistants that drive the round (commands, scripts, grep, PR drafts). A person approves and steers; Claude Code did the 7.2 round except Ixian, which was done with Vibe.
-- [wp-ops](https://github.com/imagewize/wp-ops): our own CLI and MCP server for WordPress operations (DB backup and pull, package sync, audits).
+- [wp-ops](https://github.com/imagewize/wp-ops): our own CLI and MCP server for WordPress operations (DB backup and pull, package sync, audits); see above.
 - Plugin Check, PHPCS, PHPUnit.
 - [Composer](https://getcomposer.org/): core, themes and plugins are dependencies on Bedrock; pins and lockfiles decide what ships, and `composer lint` / `composer check` scripts run the checks in each repo.
 - [Packagist](https://packagist.org/): where released versions of our own themes and plugins are published (tags are immutable).
