@@ -8,12 +8,21 @@ Legend: **script** = a command or tool that does the check; **AI** = an assistan
 
 ## 1. Set up the RC copy
 
+The rows below use a small shell helper, `W`, that runs WP-CLI inside the demo's Trellis VM (core lives in `web/wp` on Bedrock):
+
+```sh
+cd ~/code/imagewize.com/trellis
+W() { trellis vm shell --workdir /srv/www/demo.imagewize.com/current -- wp "$@" --path=web/wp; }
+```
+
+So `W core version` runs `wp core version --path=web/wp` in the demo's current release.
+
 | Step | Command (shortened) | Kind |
 |---|---|---|
-| DB backup of the demo before touching core | `trellis vm shell --workdir /srv/www/demo.imagewize.com/current -- wp db export /tmp/demo-pre-7.2-rc3.sql --path=web/wp` | script |
-| Move core to the RC (Bedrock pins 7.1.5 in Composer, so a later `composer install` reverts it) | `... -- wp core update --version=7.2-RC3 --force --path=web/wp` | script |
-| Run DB upgrade on the multisite | `... -- wp core update-db --network --path=web/wp` | script |
-| Confirm version | `... -- wp core version --path=web/wp` | script |
+| DB backup of the demo before touching core | `W db export /tmp/demo-pre-7.2-rc3.sql` | script |
+| Move core to the RC (Bedrock pins 7.1.5 in Composer, so a later `composer install` reverts it) | `W core update --version=7.2-RC3 --force` | script |
+| Run DB upgrade on the multisite | `W core update-db --network` | script |
+| Confirm version | `W core version` | script |
 | Create a local-only `admin` so Sentinel can log in (needed after every production DB pull) | `tools/scripts/sentinel-local-admin.sh demo.imagewize.com` | script (in the seo-strategy repo) |
 | Sync the working copy of a package into the site copy without releasing it | `SITE_ROOT=~/code/imagewize.com/demo/web/app wp-ops rsync-package-to-site plugin aludra ~/code/aludra` (same for `theme <name>`; `--dry-run` first) | script (wp-ops CLI) |
 
