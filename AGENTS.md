@@ -8,6 +8,7 @@ A Markdown-only notes repo, not a tool: no build, lint, or test commands. It rec
 
 - `README.md`: the general flow (setup → grep → test per repo → fix → release → deploy → log), tools used, and the **Rounds** index table.
 - `docs/bedrock-composer.md`: how updates reach the Bedrock/Trellis sites via Composer (package sources, RC setup, `composer install` reset, hybrid vs FSE checks).
+- `docs/shared-hosting.md`: the other half, plain shared-hosting client sites (Valet debugging, FTP wrapper and version probe for hosts without SSH, backups). Keep client names, hosts and credentials out.
 - `rounds/YYYY-MM-wp-X-Y.md`: one file per update round (e.g. `rounds/2026-11-wp-7-2.md`).
 
 ## Adding or editing a round
