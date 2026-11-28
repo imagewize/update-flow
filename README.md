@@ -32,7 +32,7 @@ The round is a human-run checklist with scripted and AI-assisted steps. There is
 | Release | Manual: changelog, bump, PR, tag after merge. A candidate for templating (see the round notes) |
 | Deploy | Composer pin bump, then `trellis deploy`; a person triggers it and checks the result in a browser |
 
-The scripts are run per round, not on a schedule. Rounds follow WordPress core releases, not client requests.
+The scripts are run per round, not on a schedule. Rounds follow WordPress core releases, not client requests. Ideas for automating more (parallel Sentinel, shared scripts, release templating) are in [docs/improvements.md](docs/improvements.md).
 
 ## Bedrock and Composer
 
