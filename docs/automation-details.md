@@ -100,6 +100,22 @@ By hand or with the assistant, one branch per repo, named `chore/wp-7-2-compat`.
 
 The test plan in `seo-strategy/docs/wp-7-2-compatibility-test-plan-2026-11.md` is edited throughout the day (a small Python script replaces text per repo as each check finishes), and the day's entry goes into the monthly log. Round notes here are written from those two.
 
+## Other tools and scripts the assistant used
+
+Besides Sentinel, pt-cli and wp-ops, the round ran on plain command-line tools and short scripts the assistant wrote:
+
+| Tool | Used for |
+|---|---|
+| `grep`, `sed` | The grep pass; bulk edits such as version and `Tested up to` lines, and one-line code fixes (e.g. numeric image `width`/`height` in Nynaeve Feature Cards) |
+| `python3` heredocs | Text edits that need exact matches: updating the test plan after each check, rewriting PR bodies, changelog entries |
+| `node` Playwright scripts | Throwaway editor and front-end passes (Aludra block insert, Warder front end and admin, Nynaeve front end, a padding check); written into a scratch directory, not committed |
+| `wp` (WP-CLI) in the VM, `trellis`, `limactl` | Core and plugin state, template and part counts, deploys, VM access |
+| `composer`, `npm`, `phpcs` | Pin bumps, builds, lint and coding standards |
+| `git`, `gh` | Branches, PRs, PR body edits, releases |
+| `svn`, `svn-wporg-deploy`, `bin/prepare-svn.sh` | wp.org plugin releases |
+| `curl` | Checking the WordPress beta channel and HTTP status of pages |
+| Claude in Chrome (browser MCP) | A few looks at pages in a real browser |
+
 ## Not automated yet
 
 - Running Sentinel in parallel; the 7.2 round ran it as one long job per repo.
