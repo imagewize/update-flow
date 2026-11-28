@@ -23,8 +23,8 @@ The site is linked in [Laravel Valet](https://laravel.com/docs/valet) and served
 | PHP errors | `WP_DEBUG` and `WP_DEBUG_LOG` on, `WP_DEBUG_DISPLAY` off; read `wp-content/debug.log`. |
 | Server errors (500, 502) | `valet log`, `valet log nginx`, `valet log php-fpm`. |
 | Page cache hiding changes | Purge it (`wp rocket flush` or `wp cache flush`) after DB or content changes, and after a plugin round on production. |
-| Outgoing mail | A local-only must-use plugin routes `wp_mail()` to MailHog (`localhost:1025`, UI on `8025`), so test orders and form submits cannot mail real people. Never deploy it to production. |
-| Local URLs | Search-replace the production URL to the `.test` URL after the DB import. Pull the DB fresh before every round; the copy drifts as soon as the client edits content. |
+| Outgoing mail | A local-only must-use plugin routes `wp_mail()` to MailHog (`localhost:1025`, UI on `8025`), so test orders and form submits cannot mail real people. Never deploy it to production. ([Write-up](https://wpvilla.in/mailhog-local-wordpress-email-testing/).) |
+| Local URLs | Search-replace the production URL to the `.test` URL after the DB import. Pull the DB fresh before every round; the copy drifts as soon as the client edits content ([refreshing local sites from production without leaving `.com` URLs behind](https://wpvilla.in/refresh-local-wordpress-from-production-wp-ops/)). |
 | TLS | `valet secure <site>` if the cert warns. |
 
 The web server differs (Nginx locally, Apache on the host) but that has not made an update fail. The exception is a plugin that writes its own `.htaccess` rules (page cache, WebP rewrites, security plugins): when one of those updates, check that feature on production.
@@ -44,7 +44,7 @@ When the host gives FTP and wp-admin only, `wp plugin list` and `wp db export` a
 
 ### An FTP wrapper
 
-A curl wrapper that forces explicit FTP over TLS (`--ssl-reqd`, the same as the FileZilla GUI) and takes the password from FileZilla's Site Manager at runtime, so it never lands on a command line, in a file or in a log. The Site Manager stores the password base64-encoded; if FileZilla has a master password set, decoding fails and you re-enter the password in FileZilla instead of working around it.
+A curl wrapper that forces explicit FTP over TLS (`--ssl-reqd`, the same as the FileZilla GUI) and takes the password from FileZilla's Site Manager at runtime, so it never lands on a command line, in a file or in a log. The Site Manager stores the password base64-encoded; if FileZilla has a master password set, decoding fails and you re-enter the password in FileZilla instead of working around it. Full write-up: [decode it at runtime, wrap curl, insist on explicit FTPS](https://wpvilla.in/filezilla-sitemanager-base64-password-curl-explicit-ftps-netrc/).
 
 ```bash
 #!/usr/bin/env bash
@@ -89,7 +89,7 @@ What it found in practice: a count mismatch between production's update screen a
 ### Database and file backups
 
 - **With SSH but no `exec()`** (common hardening): `wp db export` fails because it shells out to `mysqldump`. Call `mysqldump` over SSH directly and stream the dump to your machine; do not put the DB password on the command line (it shows in `ps` on a shared host).
-- **FTP only:** upload a small PHP script that loads `wp-load.php`, dumps every table with `$wpdb`, and writes the SQL file; trigger it in the browser, download the file over FTP, then delete both from the server. It covers the database only; files come over FTP or from the host's own backup tool.
+- **FTP only:** upload a small PHP script that loads `wp-load.php`, dumps every table with `$wpdb`, and writes the SQL file; trigger it in the browser, download the file over FTP, then delete both from the server. It covers the database only; files come over FTP or from the host's own backup tool. Full script and notes: [WordPress database backup when you only have FTP](https://wpvilla.in/wordpress-database-backup-ftp-only-no-ssh/).
 - **FTP is slow for many small files.** A full WordPress tree is thousands of files and FTP pays a round trip per file. Prefer the host's backup tool, a tarball, or parallel connections; check whether the limit is per connection before assuming it is bandwidth.
 - **Download the backup off the host** and check sizes and archive listings before touching anything. A backup stored only on the server goes down with the server.
 
@@ -98,6 +98,16 @@ What it found in practice: a count mismatch between production's update screen a
 Preferred: one-click updates in wp-admin (batch by batch, in the tested order), then purge caches. Fallback when a one-click refuses (licence or connectivity): download the exact version that passed local testing and upload it over FTP, deleting the old plugin directory first.
 
 Rollback is a restore of the DB backup plus re-uploading the previous plugin directories. Take them from the pre-update file backup or the local copy before you start.
+
+## Further reading
+
+Posts on wpvilla.in that go deeper on single steps:
+
+- [Catching WordPress emails locally with MailHog](https://wpvilla.in/mailhog-local-wordpress-email-testing/)
+- [Refreshing local WordPress sites from production](https://wpvilla.in/refresh-local-wordpress-from-production-wp-ops/)
+- [WordPress database backup when you only have FTP](https://wpvilla.in/wordpress-database-backup-ftp-only-no-ssh/)
+- [The FTP password in FileZilla's `sitemanager.xml`: decode at runtime, wrap curl, explicit FTPS](https://wpvilla.in/filezilla-sitemanager-base64-password-curl-explicit-ftps-netrc/)
+- [Safe plugin updates on a Plesk site: WP Toolkit's WP-CLI, an FTP download and batches](https://wpvilla.in/plesk-wp-toolkit-wp-cli-backup-and-plugin-updates/) (the case where the host does offer WP-CLI)
 
 ## Business angle
 
