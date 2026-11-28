@@ -65,11 +65,11 @@ Kind: **script** for the counting, **AI** for reading the hits against the dev n
 | Plugin Check | `wp plugin activate plugin-check --url=...`, then run it on the plugin in the demo | script |
 | Editor pass (insert every block, save, reload, check validity and Inspector) | Playwright script written per repo, e.g. Aludra inserted 28 of 34 block types | AI wrote it, script runs it |
 | Front-end and admin pass | Playwright scripts, e.g. a Warder script for banner, accept/reject, modal, persistence after reload; one for the settings page save | AI wrote it, script runs it |
-| Dedicated browser check | `tests/browser-check.js` in Aviendha and Elayne Legal | script |
+| Dedicated browser check | `tests/browser-check.js` in Aviendha and Elayne Legal (`npm run test:browser`; Playwright comes with the Sentinel dependency, `npm run setup` installs Chromium; needs the local-only admin from `sentinel-local-admin.sh`) | script |
 | Site Editor and server-side registration | `wp` commands in the VM: count templates and parts, check the Site Editor canvas for invalid blocks | script |
 | Look at the result | read console output and `debug.log`, look at the pages | by hand |
 
-Sentinel facts from the round: Elayne's full run took about 20 minutes for 161 patterns (149 first run, 160 after fixes). It logs to `sentinel-<timestamp>.log.json` with `--log`. With `--trellis` it reads the vault only and ignores `.env`, so Elayne Legal's run used a scratch directory with a `.env` and no `--trellis` (documented in that repo's `AGENTS.md`). The Playwright scripts for the editor and front-end passes were mostly throwaway files in a scratch directory, not committed, except `tests/browser-check.js`.
+Sentinel facts from the round: Elayne's full run took about 20 minutes for 161 patterns (149 first run, 160 after fixes). It logs to `sentinel-<timestamp>.log.json` with `--log`. With `--trellis` it reads the vault only and ignores `.env`, so Elayne Legal's run used a scratch directory with a `.env` and no `--trellis` (documented in that repo's `AGENTS.md`). The Playwright scripts for the editor and front-end passes were mostly throwaway files in a scratch directory, not committed, except `tests/browser-check.js`, which does not add Playwright itself but reuses the copy Sentinel installs and is tied to the local demo (URL, subsite, home ID and page list default to Aviendha's, overridable by env vars).
 
 ## 4. Fix
 
