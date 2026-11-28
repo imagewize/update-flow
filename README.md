@@ -52,6 +52,16 @@ What the AI adds on top is the glue: which backup or core-update command to run 
 
 Both sites are [Bedrock](https://roots.io/bedrock/) installs deployed with [Trellis](https://roots.io/trellis/), so core, themes and plugins are Composer dependencies, not wp-admin updates. That changes how the RC is installed (`wp core update`, which a `composer install` resets), how packages reach production (release, bump the pin, `trellis deploy`) and which checks apply to hybrid versus FSE themes. Details in [docs/bedrock-composer.md](docs/bedrock-composer.md).
 
+## Shared-hosting client sites
+
+The flow above is for the Bedrock/Trellis sites. Client sites on plain shared hosting (classic WordPress, updated through wp-admin or WP-CLI, no Composer) work differently, and nothing in the rounds covers them. Three differences:
+
+- **Test locally, pinned to the host.** Pull files and DB into a local [Laravel Valet](https://laravel.com/docs/valet) copy, pin the PHP version to the host's (`valet isolate php@8.x`), and run the update there. PHP is what has to match, sometimes MySQL; the web server (Nginx locally, Apache on the host) has not caused a failed update. The exception is a plugin that writes its own `.htaccess` rules (page cache, WebP rewrites, security plugins), which gets rechecked on production.
+- **Check the same way, by hand or script.** Debug log, console, then before/after screenshots of key pages (`wp-ops update-snapshot` / `update-compare`) and a manual click-through, including a test order and the contact form on shops. MailHog catches local mail.
+- **Repeat on production.** The update is applied again on the host, so production is not the tested artifact. There is no atomic rollback: take a full DB and files backup first, then check production again afterwards.
+
+Limits that come with shared hosting: often no SSH or WP-CLI on the host (FTP and wp-admin only), licences bound to the production domain that refuse the local one (so those plugins can only be tested on production), and legacy page builders that need their own care after an update (for example regenerating the CSS cache). These rounds are started on request, not on a schedule, and are not a subscription.
+
 ## Tools used
 
 - [WP Pattern Sentinel](https://github.com/imagewize/wp-pattern-sentinel): validates block patterns in a real editor (see above).
