@@ -16,6 +16,24 @@ Not a tool. A running record, one file per round, so the next round starts from 
 6. **Deploy:** bump the Composer pins in the main-site and demo repos, run `trellis deploy`, then verify in a real browser.
 7. **Log** results and gaps (what was not tested), and re-run on the final RC.
 
+## What is automated and what is manual
+
+The round is a human-run checklist with scripted and AI-assisted steps. There is no scheduler and no unattended pipeline: a person starts each round, reads the results and decides what ships.
+
+| Step | How it is done |
+|---|---|
+| Set up RC copy, DB backup | Manual, with WP-CLI and Composer commands |
+| Grep for changed APIs | AI-assisted: Claude Code or Vibe searches each repo against the field guide and dev notes; a person reviews the hits |
+| Static pattern check | Scripted: [pt-cli](https://github.com/imagewize/pt-cli) via `composer check`, seconds per repo |
+| Pattern validation in the editor | Scripted: [WP Pattern Sentinel](https://github.com/imagewize/wp-pattern-sentinel) opens each pattern in a real block editor and flags invalid blocks (Elayne: ~20 min for 161 patterns) |
+| Editor and front-end passes | Part scripted: Playwright scripts (e.g. `tests/browser-check.js` in Aviendha and Elayne Legal), the rest by hand in a browser |
+| Lint and unit tests | Scripted: PHPCS, PHPUnit, Plugin Check through `composer lint` / `composer check` |
+| Fixes | Written by hand or with an AI assistant, reviewed in a PR per repo |
+| Release | Manual: changelog, bump, PR, tag after merge. A candidate for templating (see the round notes) |
+| Deploy | Composer pin bump, then `trellis deploy`; a person triggers it and checks the result in a browser |
+
+The scripts are run per round, not on a schedule. Rounds follow WordPress core releases, not client requests. The exact commands, step by step, are in [docs/automation-details.md](docs/automation-details.md). Ideas for automating more (parallel Sentinel, shared scripts, release templating) are in [docs/improvements.md](docs/improvements.md).
+
 ## Bedrock and Composer
 
 Both sites are [Bedrock](https://roots.io/bedrock/) installs deployed with [Trellis](https://roots.io/trellis/), so core, themes and plugins are Composer dependencies, not wp-admin updates. That changes how the RC is installed (`wp core update`, which a `composer install` resets), how packages reach production (release, bump the pin, `trellis deploy`) and which checks apply to hybrid versus FSE themes. Details in [docs/bedrock-composer.md](docs/bedrock-composer.md).
@@ -24,7 +42,8 @@ Both sites are [Bedrock](https://roots.io/bedrock/) installs deployed with [Trel
 
 - [WP Pattern Sentinel](https://github.com/imagewize/wp-pattern-sentinel): validates block patterns in a real editor.
 - [pt-cli](https://github.com/imagewize/pt-cli): static block-markup check of theme patterns and templates, no WordPress install needed (`composer check`). Fast first pass before Sentinel.
-- Playwright scripts for editor and front-end passes.
+- Playwright scripts for editor and front-end passes (per-repo `tests/browser-check.js` where it exists).
+- [Claude Code](https://claude.com/claude-code) and Vibe: AI assistants for the grep pass, reading release notes against code, and parallel checks on a repo. They propose; tests and a person decide.
 - Plugin Check, PHPCS, PHPUnit.
 - [Composer](https://getcomposer.org/): core, themes and plugins are dependencies on Bedrock; pins and lockfiles decide what ships, and `composer lint` / `composer check` scripts run the checks in each repo.
 - [Packagist](https://packagist.org/): where released versions of our own themes and plugins are published (tags are immutable).
