@@ -6,6 +6,8 @@ Read this as a log of what was done, not a one-command pipeline. A person starts
 
 Legend: **script** = a command or tool that does the check; **AI** = an assistant wrote or ran the command and a person reviewed the output; **by hand** = a person did it.
 
+In commands, `...` means a value left out for brevity (a URL, a PR title or body), and `<name>` is a placeholder to fill in. "Command (shortened)" means the real command had more flags or longer arguments.
+
 ## 1. Set up the RC copy
 
 The rows below use a small shell helper, `W`, that runs WP-CLI inside the demo's Trellis VM (core lives in `web/wp` on Bedrock):
