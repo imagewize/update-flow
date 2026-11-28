@@ -60,7 +60,7 @@ The flow above is for the Bedrock/Trellis sites. Client sites on plain shared ho
 - **Check the same way, by hand or script.** Debug log, console, then before/after screenshots of key pages (`wp-ops update-snapshot` / `update-compare`) and a manual click-through, including a test order and the contact form on shops. MailHog catches local mail.
 - **Repeat on production.** The update is applied again on the host, so production is not the tested artifact. There is no atomic rollback: take a full DB and files backup first, then check production again afterwards.
 
-Limits that come with shared hosting: often no SSH or WP-CLI on the host (FTP and wp-admin only), licences bound to the production domain that refuse the local one (so those plugins can only be tested on production), and legacy page builders that need their own care after an update (for example regenerating the CSS cache). These rounds are started on request, not on a schedule, and are not a subscription.
+Limits that come with shared hosting: often no SSH or WP-CLI on the host (FTP and wp-admin only), licences bound to the production domain that refuse the local one (so those plugins can only be tested on production), and legacy page builders that need their own care after an update (for example regenerating the CSS cache). These rounds are started on request, not on a schedule, and are not a subscription. The Valet debugging setup and the FTP and PHP scripts for hosts without SSH are in [docs/shared-hosting.md](docs/shared-hosting.md).
 
 ## Tools used
 
