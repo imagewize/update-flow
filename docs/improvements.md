@@ -4,21 +4,25 @@ Ideas for cutting the time of the next round. None of this is built yet unless m
 
 ## Scale scrutiny to the risk of the update
 
-The 7.2 round took about 7.5 hours of round work across 10 repos, and almost all of it went on proving nothing broke. Every repo got roughly the same full pass whether or not the release touched anything it uses. Client rounds are much faster: one site, no release pipeline, no pattern validation, no tagging. A 13-plugin round on a single shared-host shop took about 2 hours (see [shared-hosting.md](shared-hosting.md)). Most of the gap is not the checks themselves but the number of repos, and the release work on our own themes and plugins.
+The 7.2 round took about 7.5 hours of round work across 10 repos, and almost all of it went on proving nothing broke. Every repo got roughly the same full pass whether or not the release touched anything it uses. Client rounds are much faster: one site, no release pipeline, no pattern validation, no tagging. A 13-plugin round on a single shared-host shop took about 2 hours (user estimate, not logged; the flow is in [shared-hosting.md](shared-hosting.md)). Most of the gap is not the checks themselves but the number of repos, and the release work on our own themes and plugins.
 
-Proposal, not tried yet: tier the pass by what changed, and keep the full pass for the top tier.
+Proposal, not tried yet: tier the pass per repo by what changed, and keep the full pass for the repos that need it.
 
-| Tier | Example | Pass |
+The tier is set in two steps. The release sets the ceiling, that is, how heavy the pass can get and what guards apply. The grep over each repo then decides which repos actually get that pass. A core RC therefore no longer means a full pass for all ten repos, only for the ones with hits.
+
+| Tier | When (per repo) | Pass |
 |---|---|---|
-| Patch or minor update, changelog shows no API change, grep finds no hits in the repo | A bug-fix plugin release, a core point release | Light: read the changelog, `composer check` or `wp plugin list` clean, `debug.log` empty after a front-end and editor smoke test, one before/after screenshot set. No block-by-block editor pass. |
-| Minor release that changes behaviour the repo uses (grep hits), or touches the editor, blocks or checkout | A core minor with block editor changes, a WooCommerce minor | Full pass for the affected repos only: editor pass, pattern validation, browser check. Skip the repos with no hits. |
-| Major update, release candidate, or a plugin with its own data migrations | A core major, a WooCommerce major, a page-builder update | Full pass, its own batch, DB backup first, human gate before production. |
+| Light | Grep finds no hits in the repo, and the changelog shows no change to block markup, `save()` output, the editor or checkout | Read the changelog, `composer check` or `wp plugin list` clean, no new `debug.log` entries after a front-end and editor smoke test, one before/after screenshot set. No block-by-block editor pass. |
+| Full | Grep hits in the repo, or the release touches block markup, `save()` output, the editor, blocks or checkout | Editor pass, pattern validation, browser check for this repo. |
+| Full and guarded | A Full repo on a release-candidate or major ceiling, or any plugin with its own data migrations (WooCommerce major, page builder) | Full pass, its own batch, DB backup first, human gate before production. |
 
 What would make this work:
 
-- **Decide from the grep, not from the version number.** A patch can break something and a major can touch nothing you use, so the grep pass over each repo is what puts it in a tier. That ties into the per-release pattern file under Grep pass below.
+- **Decide from the grep, not from the version number.** A patch can break something and a major can touch nothing you use, so the grep pass over each repo is what puts it in a tier. The version only decides whether a Full repo also gets the guards. A core point release is not automatically light: point releases sometimes patch block `save()` output, which puts the affected repos in Full. The grep relies on the per-release pattern file under Grep pass below.
+- **Give zero-hit repos a bump-only release.** In 7.2 the release pipeline (~1.5 h) and deploys (~1 h) were about a third of the round, and tiering the checks alone doesn't touch that. A Light repo only needs a `Tested up to` bump and a patch release. Batch those bumps into one PR per repo, run in one go, and skip the per-repo PR write-ups. A Light theme or plugin that the sites don't need yet can wait for its next real release before the Composer pin is bumped.
+- **Backtest on 7.2 before trusting it.** Take the grep hits per repo from the 7.2 round, sort the repos into tiers, and check whether a Light pass would have missed a real finding. The Elayne pattern drift came from the editor rewriting saved markup, not from a removed API, so a grep may not have flagged it. If the backtest shows a miss, add that signal (for example "theme ships patterns", for a core release that changes the editor) to the Full criteria.
 - **Skip repos with zero hits** for the full editor pass, but still run the cheap static checks (`composer check`, pt-cli) everywhere, since they take seconds.
-- **Use screenshot compare as the default light check** (`wp-ops update-snapshot` / `update-compare`) instead of hand-driven editor passes for plugin-only rounds. The one flagged page in a recent client round was a false positive, so mask rotating content up front.
+- **Use screenshot compare as the default light check** (`wp-ops update-snapshot` / `update-compare`) instead of hand-driven editor passes for plugin-only rounds. In a recent client round the one flagged page was a false positive (not logged in this repo), so mask rotating content up front.
 - **Batch patch updates** together and only split out the ones in the top tier, as is already done for WooCommerce and page builders.
 - **Log what a light pass skipped** in the round file, the same way the gaps are logged now, so a missed regression can be traced back to the tier decision.
 
@@ -52,4 +56,4 @@ The scripts live inside separate repos. Moving the reusable ones (browser check,
 
 ## Measuring
 
-Nothing logged time per activity in 7.2; the split is rebuilt from commits. Logging start and stop per activity (even a plain text file) would turn the next round's estimates into numbers.
+Nothing logged time per activity in 7.2; the split is rebuilt from commits. Logging start and stop per activity (even a plain text file) would turn the next round's estimates into numbers. Log time per repo and per tier too, since that is the only way to tell whether the Light pass actually saves time (see Scale scrutiny above).
