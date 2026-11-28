@@ -54,6 +54,27 @@ Risk to watch: a lighter pass is a bet. Pattern drift and invalid blocks after a
 
 The scripts live inside separate repos. Moving the reusable ones (browser check, grep patterns, release helpers) into a shared location would let a new theme or plugin join a round without copying code. Open question: one public tools repo, or per-tool repos like pt-cli and Sentinel today.
 
+## Estimated saving
+
+A rough guess at what all of the above would save on the next comparable round, mapped onto the 7.2 split. Nothing here is measured: the 7.2 split is itself rebuilt from commits, and none of the fixes has been tried.
+
+| 7.2 activity | 7.2 time | Fixes that apply | Rough saving |
+|---|---|---|---|
+| Browser and editor passes | ~2.25 h | Light pass for zero-hit repos, shared browser-check script | 0.75–1.5 h |
+| Release pipeline | ~1.5 h | One release command, bump-only releases for Light repos, re-tag guard | 0.5–1 h |
+| Pattern validation | ~1.25 h | Sentinel in parallel, generated fixtures, pt-cli in CI so drift is fixed before the round | 0.25–0.5 h |
+| Deploys and checks | ~1 h | Scripted pin bump and post-deploy check, fewer pin bumps when Light repos wait | 0.25–0.5 h |
+| Setup and grep | ~0.75 h | Sentinel login fixed once, stored grep patterns run with one command | 0.25–0.5 h |
+| Bug fixes | ~0.5–1 h | None; this is the real work | 0 |
+| **Total** | **~7.5 h** | | **~2–4 h**, so a round of ~3.5–5.5 h |
+
+Caveats:
+
+- **The range depends on how many repos have no grep hits.** With 6 of 10 repos Light, expect the top of the range; with 2 or 3, closer to 2 h. The 7.2 backtest above answers this.
+- **Some of the saving is waiting time, not your own time.** Running Sentinel in parallel shortens how long the round takes overall more than your hands-on hours.
+- **Building the tools costs time,** which this table doesn't include. The break-even point in rounds is unknown. The bump-only path and the grep pattern file are probably the cheapest to set up for what they save.
+- **The Light pass is a bet.** A missed regression in production costs more than it saved.
+
 ## Measuring
 
 Nothing logged time per activity in 7.2; the split is rebuilt from commits. Logging start and stop per activity (even a plain text file) would turn the next round's estimates into numbers. Log time per repo and per tier too, since that is the only way to tell whether the Light pass actually saves time (see Scale scrutiny above).
