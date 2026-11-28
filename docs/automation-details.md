@@ -10,21 +10,21 @@ In commands, `...` means a value left out for brevity (a URL, a PR title or body
 
 ## 1. Set up the RC copy
 
-The rows below use a small shell helper, `w`, that runs WP-CLI inside the demo's Trellis VM (core lives in `web/wp` on Bedrock):
+The rows below use a small shell helper, `wpvm`, that runs WP-CLI inside the demo's Trellis VM (core lives in `web/wp` on Bedrock):
 
 ```sh
 cd ~/code/imagewize.com/trellis
-w() { trellis vm shell --workdir /srv/www/demo.imagewize.com/current -- wp "$@" --path=web/wp; }
+wpvm() { trellis vm shell --workdir /srv/www/demo.imagewize.com/current -- wp "$@" --path=web/wp; }
 ```
 
-So `w core version` runs `wp core version --path=web/wp` in the demo's current release.
+So `wpvm core version` runs `wp core version --path=web/wp` in the demo's current release.
 
 | Step | Command (shortened) | Kind |
 |---|---|---|
-| DB backup of the demo before touching core | `w db export /tmp/demo-pre-7.2-rc3.sql` | script |
-| Move core to the RC (Bedrock pins 7.1.5 in Composer, so a later `composer install` reverts it) | `w core update --version=7.2-RC3 --force` | script |
-| Run DB upgrade on the multisite | `w core update-db --network` | script |
-| Confirm version | `w core version` | script |
+| DB backup of the demo before touching core | `wpvm db export /tmp/demo-pre-7.2-rc3.sql` | script |
+| Move core to the RC (Bedrock pins 7.1.5 in Composer, so a later `composer install` reverts it) | `wpvm core update --version=7.2-RC3 --force` | script |
+| Run DB upgrade on the multisite | `wpvm core update-db --network` | script |
+| Confirm version | `wpvm core version` | script |
 | Create a local-only `admin` so Sentinel can log in (needed after every production DB pull) | `tools/scripts/sentinel-local-admin.sh demo.imagewize.com` | script (in the seo-strategy repo) |
 | Sync the working copy of a package into the site copy without releasing it | `SITE_ROOT=~/code/imagewize.com/demo/web/app wp-ops rsync-package-to-site plugin aludra ~/code/aludra` (same for `theme <name>`; `--dry-run` first) | script (wp-ops CLI) |
 
