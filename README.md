@@ -18,21 +18,23 @@ Not a tool. A running record, one file per round, so the next round starts from 
 
 ## What is automated and what is manual
 
-The round is a human-run checklist with scripted and AI-assisted steps. There is no scheduler and no unattended pipeline: a person starts each round, reads the results and decides what ships.
+The 7.2 round was driven by an AI coding assistant, mostly [Claude Code](https://claude.com/claude-code), with Mistral Vibe on Ixian. The assistant proposed and ran the commands: DB backups, moving core to the RC, the local Sentinel login, syncing packages to the test sites with wp-ops, the grep pass, the Playwright scripts, PR bodies and release steps. The person approved each command, steered, and supplied the WordPress field guide and dev notes. The checks themselves are our own tools and standard ones (WP Pattern Sentinel, pt-cli, wp-ops, Playwright, PHPCS, PHPUnit). There is no scheduler and no unattended pipeline.
 
-| Step | How it is done |
+| Step | Who does what |
 |---|---|
-| Set up RC copy, DB backup | Manual, with WP-CLI and Composer commands |
-| Grep for changed APIs | AI-assisted: Claude Code or Vibe searches each repo against the field guide and dev notes; a person reviews the hits |
-| Static pattern check | Scripted: [pt-cli](https://github.com/imagewize/pt-cli) via `composer check`, seconds per repo |
-| Pattern validation in the editor | Scripted: [WP Pattern Sentinel](https://github.com/imagewize/wp-pattern-sentinel) opens each pattern in a real block editor and flags invalid blocks (Elayne: ~20 min for 161 patterns) |
-| Editor and front-end passes | Part scripted: Playwright scripts (e.g. `tests/browser-check.js` in Aviendha and Elayne Legal), the rest by hand in a browser |
-| Lint and unit tests | Scripted: PHPCS, PHPUnit, Plugin Check through `composer lint` / `composer check` |
-| Fixes | Written by hand or with an AI assistant, reviewed in a PR per repo |
-| Release | Manual: changelog, bump, PR, tag after merge. A candidate for templating (see the round notes) |
-| Deploy | Composer pin bump, then `trellis deploy`; a person triggers it and checks the result in a browser |
+| Set up RC copy, DB backup | Claude Code proposes and runs the WP-CLI commands in the Trellis VM; the person approves |
+| Local test login for Sentinel | Claude Code proposed a helper script that creates a local-only `admin` user after each production DB pull |
+| Sync packages to the test sites | Claude Code runs `wp-ops rsync-package-to-site` (wp-ops is our own CLI) |
+| Grep for changed APIs | Claude Code searches each repo against the field guide and dev notes the person supplies; the person reviews the hits |
+| Static pattern check | [pt-cli](https://github.com/imagewize/pt-cli) via `composer check`, seconds per repo |
+| Pattern validation in the editor | [WP Pattern Sentinel](https://github.com/imagewize/wp-pattern-sentinel) opens each pattern in a real block editor and flags invalid blocks (Elayne: ~20 min for 161 patterns), run by Claude Code |
+| Editor and front-end passes | Claude Code writes and runs Playwright scripts per repo (mostly throwaway; `tests/browser-check.js` in Aviendha and Elayne Legal is kept); the person looks at the results |
+| Lint and unit tests | PHPCS, PHPUnit, Plugin Check through `composer lint` / `composer check`, run by Claude Code |
+| Fixes | Claude Code proposes, the person reviews, one PR per repo |
+| Release | Claude Code drafts changelog, PR body and release steps; the person approves, merges and tags after merge. A candidate for templating (see the round notes) |
+| Deploy | Composer pin bump, then `trellis deploy`, run by Claude Code on approval; the result is checked in a browser |
 
-The scripts are run per round, not on a schedule. Rounds follow WordPress core releases, not client requests. The exact commands, step by step, are in [docs/automation-details.md](docs/automation-details.md). Ideas for automating more (parallel Sentinel, shared scripts, release templating) are in [docs/improvements.md](docs/improvements.md).
+Rounds follow WordPress core releases, not client requests, and the person starts each one. The exact commands, step by step, are in [docs/automation-details.md](docs/automation-details.md). Ideas for automating more (parallel Sentinel, shared scripts, release templating) are in [docs/improvements.md](docs/improvements.md).
 
 ## Bedrock and Composer
 
@@ -43,7 +45,8 @@ Both sites are [Bedrock](https://roots.io/bedrock/) installs deployed with [Trel
 - [WP Pattern Sentinel](https://github.com/imagewize/wp-pattern-sentinel): validates block patterns in a real editor.
 - [pt-cli](https://github.com/imagewize/pt-cli): static block-markup check of theme patterns and templates, no WordPress install needed (`composer check`). Fast first pass before Sentinel.
 - Playwright scripts for editor and front-end passes (per-repo `tests/browser-check.js` where it exists).
-- [Claude Code](https://claude.com/claude-code) and Vibe: AI assistants for the grep pass, reading release notes against code, and parallel checks on a repo. They propose; tests and a person decide.
+- [Claude Code](https://claude.com/claude-code) and Mistral Vibe: AI coding assistants that drive the round (commands, scripts, grep, PR drafts). A person approves and steers; Claude Code did the 7.2 round except Ixian, which was done with Vibe.
+- [wp-ops](https://github.com/imagewize/wp-ops): our own CLI and MCP server for WordPress operations (DB backup and pull, package sync, audits).
 - Plugin Check, PHPCS, PHPUnit.
 - [Composer](https://getcomposer.org/): core, themes and plugins are dependencies on Bedrock; pins and lockfiles decide what ships, and `composer lint` / `composer check` scripts run the checks in each repo.
 - [Packagist](https://packagist.org/): where released versions of our own themes and plugins are published (tags are immutable).

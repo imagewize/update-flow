@@ -2,11 +2,11 @@
 
 What is actually run during a round, per step, taken from the WP 7.2 round (Nov 26, 2026): the shell history of the Claude Code sessions and the commit history of the ten repos. The README has the short version ([What is automated and what is manual](../README.md#what-is-automated-and-what-is-manual)); this file has the commands.
 
-Read this as a log of what was done, not a one-command pipeline. A person starts every step and reads every result. Claude Code (and Vibe on Ixian) runs the commands in a terminal session; nothing runs unattended or on a schedule. Paths are the local layout (`~/code/<repo>`); the demo and main sites are Bedrock/Trellis installs run in a local Lima VM.
+Read this as a log of what was done, not a one-command pipeline.
 
-Legend: **script** = a command or tool that does the check; **AI** = an assistant wrote or ran the command and a person reviewed the output; **by hand** = a person did it.
+**Who did what.** Claude Code drove the round (Ixian was done with Mistral Vibe). It proposed and ran almost every command below: the DB backup, the core update to the RC, the local Sentinel login helper, the `wp-ops rsync-package-to-site` syncs, the grep loop, the Playwright scripts, PR bodies and release steps. The person approved each command, steered, and fed it the WordPress field guide and dev notes. Nothing runs unattended or on a schedule. Paths are the local layout (`~/code/<repo>`); the demo and main sites are Bedrock/Trellis installs run in a local Lima VM.
 
-In commands, `...` means a value left out for brevity (a URL, a PR title or body), and `<name>` is a placeholder to fill in. "Command (shortened)" means the real command had more flags or longer arguments.
+Legend for the Kind column: **script** = a tool or command that does the check or the work, run by Claude Code on approval; **AI** = Claude Code wrote the command, script or text and the person reviewed it; **by hand** = the person did it themselves (merging, tagging, reading results). `...` means a value left out for brevity (a URL, a PR title or body), `<name>` is a placeholder to fill in, and "Command (shortened)" means the real command had more flags or longer arguments.
 
 ## 1. Set up the RC copy
 
