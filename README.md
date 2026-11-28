@@ -18,7 +18,7 @@ Not a tool. A running record, one file per round, so the next round starts from 
 
 ## What is automated and what is manual
 
-The 7.2 round was driven by an AI coding assistant, mostly [Claude Code](https://claude.com/claude-code), with Mistral Vibe on Ixian. The assistant proposed and ran the commands: DB backups, moving core to the RC, the local Sentinel login, syncing packages to the test sites with wp-ops, the grep pass, the Playwright scripts, PR bodies and release steps. The person approved each command, steered, and supplied the WordPress field guide and dev notes. The checks themselves are our own tools and standard ones (WP Pattern Sentinel, pt-cli, wp-ops, Playwright, PHPCS, PHPUnit). There is no scheduler and no unattended pipeline.
+The 7.2 round was driven by an AI coding assistant, mostly [Claude Code](https://claude.com/claude-code), with [Mistral Vibe](https://github.com/mistralai/mistral-vibe) on Ixian. The assistant proposed and ran the commands: DB backups, moving core to the RC, the local Sentinel login, syncing packages to the test sites with wp-ops, the grep pass, the Playwright scripts, PR bodies and release steps. The person approved each command, steered, and supplied the WordPress field guide and dev notes. The checks themselves are our own tools and standard ones (WP Pattern Sentinel, pt-cli, wp-ops, Playwright, PHPCS, PHPUnit). There is no scheduler and no unattended pipeline.
 
 | Step | Who does what |
 |---|---|
@@ -38,7 +38,7 @@ Rounds follow WordPress core releases, not client requests, and the person start
 
 ## Ready-made tools the AI uses
 
-Claude Code and Mistral Vibe do not improvise the checks. They run tools we built earlier, which is why a round fits in a day. The assistant decides which command to run and reads the output; the tool does the work.
+Claude Code and [Mistral Vibe](https://github.com/mistralai/mistral-vibe) do not improvise the checks. They run tools we built earlier, which is why a round fits in a day. The assistant decides which command to run and reads the output; the tool does the work.
 
 | Tool | What it does | Where it saved time in the 7.2 round |
 |---|---|---|
@@ -67,7 +67,7 @@ Limits that come with shared hosting: often no SSH or WP-CLI on the host (FTP an
 - [WP Pattern Sentinel](https://github.com/imagewize/wp-pattern-sentinel): validates block patterns in a real editor (see above).
 - [pt-cli](https://github.com/imagewize/pt-cli): static block-markup check of theme patterns and templates, no WordPress install needed (`composer check`). Fast first pass before Sentinel.
 - Playwright scripts for editor and front-end passes (per-repo `tests/browser-check.js` where it exists).
-- [Claude Code](https://claude.com/claude-code) and Mistral Vibe: AI coding assistants that drive the round (commands, scripts, grep, PR drafts). A person approves and steers; Claude Code did the 7.2 round except Ixian, which was done with Vibe.
+- [Claude Code](https://claude.com/claude-code) and [Mistral Vibe](https://github.com/mistralai/mistral-vibe): AI coding assistants that drive the round (commands, scripts, grep, PR drafts). A person approves and steers; Claude Code did the 7.2 round except Ixian, which was done with Vibe.
 - [wp-ops](https://github.com/imagewize/wp-ops): our own CLI and MCP server for WordPress operations (DB backup and pull, package sync, audits); see above.
 - Plugin Check, PHPCS, PHPUnit.
 - [Composer](https://getcomposer.org/): core, themes and plugins are dependencies on Bedrock; pins and lockfiles decide what ships, and `composer lint` / `composer check` scripts run the checks in each repo.
